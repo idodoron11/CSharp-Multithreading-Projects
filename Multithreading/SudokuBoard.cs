@@ -46,22 +46,65 @@ namespace Multithreading
 
         public bool isValid()
         {
+            object _lock = new object();
+            bool result = true;
+
+            // Define 27 threads without starting them yet.
+            Thread[] rowThread = new Thread[9];
+            Thread[] columnThread = new Thread[9];
+            Thread[] blockThread = new Thread[9];
             for (int i = 0; i < 9; ++i)
             {
-                if (!isSegmentValid(rowEnumerator(i)))
+                int iteration = i;
+                rowThread[i] = new Thread(() =>
                 {
-                    return false;
-                }
-                else if (!isSegmentValid(columnEnumerator(i)))
+                    if (!isSegmentValid(rowEnumerator(iteration)))
+                    {
+                        lock (_lock)
+                        {
+                            result = false;
+                        }
+                    }
+                });
+                columnThread[i] = new Thread(() =>
                 {
-                    return false;
-                }
-                else if (!isSegmentValid(blockEnumerator(i)))
+                    if (!isSegmentValid(columnEnumerator(iteration)))
+                    {
+                        lock (_lock)
+                        {
+                            result = false;
+                        }
+                    }
+                });
+                blockThread[i] = new Thread(() =>
                 {
-                    return false;
-                }
+                    if (!isSegmentValid(blockEnumerator(iteration)))
+                    {
+                        lock (_lock)
+                        {
+                            result = false;
+                        }
+                    }
+                });
             }
-            return true;
+
+            // Start threads
+            for (int i = 0; i < 9; ++i)
+            {
+                rowThread[i].Start();
+                columnThread[i].Start();
+                blockThread[i].Start();
+            }
+
+            // Wait for threads termination
+            for (int i = 0; i < 9; ++i)
+            {
+                rowThread[i].Join();
+                columnThread[i].Join();
+                blockThread[i].Join();
+            }
+
+            return result;
         }
 
         private bool isSegmentValid(IEnumerable<int> segment)
@@ -69,13 +112,13 @@ namespace Multithreading
             bool[] found = new bool[9];
             foreach (int cell in segment)
             {
-                if (found[cell])
+                if (found[cell - 1])
                 {
                     return false;
                 }
                 else
                 {
-                    found[cell] = true;
+                    found[cell - 1] = true;
                 }
             }
             return true;
