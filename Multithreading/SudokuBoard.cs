@@ -17,23 +17,25 @@ namespace Multithreading
 
         public SudokuBoard(int[,] board)
         {
-            bool isValid = board != null && board.GetLength(0) == 9 && board.GetLength(1) == 9;
-            for (int i = 0; i < 9 && isValid; ++i)
+            if (board != null)
             {
-                for (int j = 0; j < 9 && isValid; ++j)
+                bool isValid = board.GetLength(0) == 9 && board.GetLength(1) == 9;
+                for (int i = 0; i < 9 && isValid; ++i)
                 {
-                    isValid &= board[i, j] <= 9 && board[i, j] >= 1;
+                    for (int j = 0; j < 9 && isValid; ++j)
+                    {
+                        isValid &= board[i, j] is <= 9 and >= 0;
+                    }
                 }
+                if (!isValid)
+                {
+                    throw new ArgumentException("The input array does not represent a valid sudoku board");
+                }
+
+                this.board = board;
             }
-            if (!isValid)
-            {
-                throw new ArgumentException("The input array does not represent a valid sudoku board");
-            }
-            else if (board == null)
-            {
-                board = new int[9, 9];
-            }
-            this.board = board;
+
+            this.board = new int[9, 9];
         }
 
         public int getCell(int row, int column)
@@ -63,6 +65,26 @@ namespace Multithreading
             if (column >= 9 || column < 0)
                 throw new ArgumentException("Column must be between 0 and 8");
             this.board[row,column] = 0;
+        }
+
+        public bool slowIsValid()
+        {
+            for (int i = 0; i < 9; ++i)
+            {
+                if (!isSegmentValid(rowEnumerator(i)))
+                {
+                    return false;
+                }
+                else if (!isSegmentValid(columnEnumerator(i)))
+                {
+                    return false;
+                }
+                else if (!isSegmentValid(blockEnumerator(i)))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public bool isValid()
@@ -117,6 +139,8 @@ namespace Multithreading
             bool[] found = new bool[9];
             foreach (int cell in segment)
             {
+                if (cell == 0)
+                    continue;
                 if (found[cell - 1])
                 {
                     return false;
