@@ -56,36 +56,9 @@ namespace Multithreading
             for (int i = 0; i < 9; ++i)
             {
                 int iteration = i;
-                rowThread[i] = new Thread(() =>
-                {
-                    if (!isSegmentValid(rowEnumerator(iteration)))
-                    {
-                        lock (_lock)
-                        {
-                            result = false;
-                        }
-                    }
-                });
-                columnThread[i] = new Thread(() =>
-                {
-                    if (!isSegmentValid(columnEnumerator(iteration)))
-                    {
-                        lock (_lock)
-                        {
-                            result = false;
-                        }
-                    }
-                });
-                blockThread[i] = new Thread(() =>
-                {
-                    if (!isSegmentValid(blockEnumerator(iteration)))
-                    {
-                        lock (_lock)
-                        {
-                            result = false;
-                        }
-                    }
-                });
+                rowThread[i] = new Thread(() => { threadWork(rowEnumerator(iteration), _lock, ref result); });
+                columnThread[i] = new Thread(() => { threadWork(columnEnumerator(iteration), _lock, ref result); });
+                blockThread[i] = new Thread(() => { threadWork(blockEnumerator(iteration), _lock, ref result); });
             }
 
             // Start threads
@@ -105,6 +78,17 @@ namespace Multithreading
             }
 
             return result;
+        }
+
+        private void threadWork(IEnumerable<int> segment, object _lock, ref bool result)
+        {
+            if (!isSegmentValid(segment))
+            {
+                lock (_lock)
+                {
+                    result = false;
+                }
+            }
         }
 
         private bool isSegmentValid(IEnumerable<int> segment)
