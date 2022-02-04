@@ -82,7 +82,7 @@ namespace Multithreading
 
         private void threadWork(IEnumerable<int> segment, object _lock, ref bool result)
         {
-            if (!isSegmentValid(segment))
+            if (result && !isSegmentValid(segment))
             {
                 lock (_lock)
                 {
