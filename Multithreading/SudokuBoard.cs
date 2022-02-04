@@ -15,6 +15,27 @@ namespace Multithreading
             board = new int[9,9];
         }
 
+        public SudokuBoard(int[,] board)
+        {
+            bool isValid = board != null && board.GetLength(0) == 9 && board.GetLength(1) == 9;
+            for (int i = 0; i < 9 && isValid; ++i)
+            {
+                for (int j = 0; j < 9 && isValid; ++j)
+                {
+                    isValid &= board[i, j] <= 9 && board[i, j] >= 1;
+                }
+            }
+            if (!isValid)
+            {
+                throw new ArgumentException("The input array does not represent a valid sudoku board");
+            }
+            else if (board == null)
+            {
+                board = new int[9, 9];
+            }
+            this.board = board;
+        }
+
         public int getCell(int row, int column)
         {
             if (row >= 9)
