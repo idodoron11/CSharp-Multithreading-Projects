@@ -19,19 +19,7 @@ namespace Multithreading
         {
             if (board != null)
             {
-                bool isValid = board.GetLength(0) == 9 && board.GetLength(1) == 9;
-                for (int i = 0; i < 9 && isValid; ++i)
-                {
-                    for (int j = 0; j < 9 && isValid; ++j)
-                    {
-                        isValid &= board[i, j] is <= 9 and >= 0;
-                    }
-                }
-                if (!isValid)
-                {
-                    throw new ArgumentException("The input array does not represent a valid sudoku board");
-                }
-
+                validateBoardArrayInput(board);
                 this.board = board;
             }
             else
@@ -42,30 +30,23 @@ namespace Multithreading
 
         public int getCell(int row, int column)
         {
-            if (row >= 9)
-                throw new ArgumentException("Row must be between 0 and 8");
-            if (column >= 9)
-                throw new ArgumentException("Column must be between 0 and 8");
+            validateRowInput(row);
+            validateColumnInput(column);
             return this.board[row,column];
         }
 
         public void setCell(int row, int column, int value)
         {
-            if (row >= 9 || row < 0)
-                throw new ArgumentException("Row must be between 0 and 8");
-            if (column >= 9 || column < 0)
-                throw new ArgumentException("Column must be between 0 and 8");
-            if (value < 1 || value > 9)
-                throw new ArgumentException("A cell can only contain integers between 1 and 9");
+            validateRowInput(row);
+            validateColumnInput(column);
+            validateCellValueInput(value);
             this.board[row,column] = value;
         }
 
         public void resetCell(int row, int column)
         {
-            if (row >= 9 || row < 0)
-                throw new ArgumentException("Row must be between 0 and 8");
-            if (column >= 9 || column < 0)
-                throw new ArgumentException("Column must be between 0 and 8");
+            validateRowInput(row);
+            validateColumnInput(column);
             this.board[row,column] = 0;
         }
 
@@ -157,8 +138,7 @@ namespace Multithreading
 
         public IEnumerable<int> rowEnumerator(int row)
         {
-            if (row >= 9 || row < 0)
-                throw new ArgumentException("Row must be between 0 and 8");
+            validateRowInput(row);
             for (int column = 0; column < 9; ++column)
             {
                 yield return board[row,column];
@@ -167,8 +147,7 @@ namespace Multithreading
 
         public IEnumerable<int> columnEnumerator(int column)
         {
-            if (column >= 9 || column < 0)
-                throw new ArgumentException("Column must be between 0 and 8");
+            validateColumnInput(column);
             for (int row = 0; row < 9; ++row)
             {
                 yield return board[row,column];
@@ -177,8 +156,7 @@ namespace Multithreading
 
         public IEnumerable<int> blockEnumerator(int block)
         {
-            if (block >= 9 || block < 0)
-                throw new ArgumentException("Block must be between 0 and 8");
+            validateBlockInput(block);
             int row, column;
             switch (block) {
                 case 0: row = 0; column = 0; break;
@@ -198,6 +176,46 @@ namespace Multithreading
                 {
                     yield return board[i,j];
                 }
+            }
+        }
+
+        private void validateRowInput(int row)
+        {
+            if (row >= 9 || row < 0)
+                throw new ArgumentException("Row must be between 0 and 8");
+        }
+
+        private void validateColumnInput(int column)
+        {
+            if (column >= 9 || column < 0)
+                throw new ArgumentException("Column must be between 0 and 8");
+        }
+
+        private void validateBlockInput(int block)
+        {
+            if (block >= 9 || block < 0)
+                throw new ArgumentException("Block must be between 0 and 8");
+        }
+
+        private void validateCellValueInput(int value)
+        {
+            if (value < 1 || value > 9)
+                throw new ArgumentException("A cell can only contain integers between 1 and 9");
+        }
+
+        private void validateBoardArrayInput(int[,] board)
+        {
+            bool isValid = board.GetLength(0) == 9 && board.GetLength(1) == 9;
+            for (int i = 0; i < 9 && isValid; ++i)
+            {
+                for (int j = 0; j < 9 && isValid; ++j)
+                {
+                    isValid &= board[i, j] is <= 9 and >= 0;
+                }
+            }
+            if (!isValid)
+            {
+                throw new ArgumentException("The input array does not represent a valid sudoku board");
             }
         }
     }
