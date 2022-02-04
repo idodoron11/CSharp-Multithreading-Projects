@@ -34,8 +34,10 @@ namespace Multithreading
 
                 this.board = board;
             }
-
-            this.board = new int[9, 9];
+            else
+            {
+                this.board = new int[9, 9];
+            }
         }
 
         public int getCell(int row, int column)
