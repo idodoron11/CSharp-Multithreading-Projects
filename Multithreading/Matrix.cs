@@ -8,12 +8,22 @@ namespace Multithreading
 {
     internal class Matrix
     {
-        double[,] matrix;
+        internal double[,] matrix;
         internal bool transpose;
 
         public Matrix(double[,] matrix)
         {
             this.matrix = (double[,]) matrix.Clone();
+        }
+
+        protected Matrix(double[] vector)
+        {
+            double[,] matrix = new double[vector.GetLength(0), 1];
+            for (int i = 0; i < vector.GetLength(0); ++i)
+            {
+                matrix[i, 0] = vector[i];
+            }
+            this.matrix = matrix;
         }
 
         public void Transpose()
@@ -72,6 +82,45 @@ namespace Multithreading
         public Matrix MultiplyBy(Matrix other)
         {
             throw new NotImplementedException();
+        }
+
+        public Matrix NaiveMultiplyBy(Matrix other)
+        {
+            if (other == null)
+                throw new ArgumentNullException();
+            if (this.GetWidth() != other.GetHeight())
+                throw new ArgumentException("Left matrix width should be the same as the right matrix height");
+
+            int resultHeight = this.GetHeight(), resultWidth = other.GetWidth();
+            double[,] result = new double[resultHeight, resultWidth];
+
+            for (int row = 0; row < resultHeight; row++)
+            {
+                for (int col = 0; col < resultWidth; ++col)
+                {
+                    // we multiply `this` row vector number `row` by `other` column vector number `col`.
+                    // we store the result at `result[row, col]`
+
+                    for (int index = 0; index < this.GetWidth(); ++index)
+                    {
+                        result[row, col] += this.Get(row, index) * other.Get(index, col);
+                    }
+                }
+            }
+
+            return new Matrix(result);
+        }
+    }
+
+    internal class Vector : Matrix
+    {
+        public Vector(params double[] vector) : base(vector)
+        {
+        }
+
+        public double Get(int index)
+        {
+            return this.matrix[index, 0];
         }
     }
 }

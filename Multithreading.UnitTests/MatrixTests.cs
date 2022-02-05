@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 
 namespace Multithreading.UnitTests
 {
@@ -62,6 +63,65 @@ namespace Multithreading.UnitTests
                     Assert.AreEqual(arr[j, i], matrix.Get(i, j));
                 }
             }
+
+            Assert.AreEqual(3, matrix.GetWidth());
+            Assert.AreEqual(5, matrix.GetHeight());
+        }
+
+        [Test]
+        public void NaiveMultiplicationTest()
+        {
+            Matrix matrix = new Matrix(new double[,] {
+                { 0, 2, 1 },
+                { 0, 1, 0 },
+                { -1, 3, 5}
+            });
+
+            Matrix vector = new Vector(10, 20, 30);
+
+            Matrix result = matrix.NaiveMultiplyBy(vector); // result should be (70, 20, 200)^T
+            Assert.AreEqual(70, result.Get(0,0));
+            Assert.AreEqual(20, result.Get(1, 0));
+            Assert.AreEqual(200, result.Get(2, 0));
+
+            matrix.Transpose();
+            vector.Transpose();
+            result = vector.NaiveMultiplyBy(matrix);  // result should be (70, 20, 200)
+            Assert.AreEqual(70, result.Get(0, 0));
+            Assert.AreEqual(20, result.Get(0, 1));
+            Assert.AreEqual(200, result.Get(0, 2));
+
+            Assert.Throws<ArgumentException>(
+                    () => { matrix.NaiveMultiplyBy(vector); }
+                );
+        }
+
+        [Test]
+        public void MultiplicationTest()
+        {
+            Matrix matrix = new Matrix(new double[,] {
+                { 0, 2, 1 },
+                { 0, 1, 0 },
+                { -1, 3, 5}
+            });
+
+            Matrix vector = new Vector(10, 20, 30);
+
+            Matrix result = matrix.MultiplyBy(vector); // result should be (70, 20, 200)^T
+            Assert.AreEqual(70, result.Get(0, 0));
+            Assert.AreEqual(20, result.Get(1, 0));
+            Assert.AreEqual(200, result.Get(2, 0));
+
+            matrix.Transpose();
+            vector.Transpose();
+            result = vector.MultiplyBy(matrix);  // result should be (70, 20, 200)
+            Assert.AreEqual(70, result.Get(0, 0));
+            Assert.AreEqual(20, result.Get(0, 1));
+            Assert.AreEqual(200, result.Get(0, 2));
+
+            Assert.Throws<ArgumentException>(
+                    () => { matrix.MultiplyBy(vector); }
+                );
         }
     }
 }
