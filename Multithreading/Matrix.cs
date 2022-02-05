@@ -81,7 +81,30 @@ namespace Multithreading
 
         public Matrix MultiplyBy(Matrix other)
         {
-            throw new NotImplementedException();
+            if (other == null)
+                throw new ArgumentNullException();
+            if (this.GetWidth() != other.GetHeight())
+                throw new ArgumentException("Left matrix width should be the same as the right matrix height");
+
+            int resultHeight = this.GetHeight(), resultWidth = other.GetWidth();
+            double[,] result = new double[resultHeight, resultWidth];
+            Task[] tasks = new Task[resultHeight * resultWidth];
+
+            for (int row = 0; row < resultHeight; row++)
+            {
+                for (int col = 0; col < resultWidth; ++col)
+                {
+                    int thisRow = row, thisCol = col;
+                    tasks[row * resultWidth + col] = Task.Factory.StartNew(() => {
+                        double cellValue = MultiplyRowByColumn(this, other, thisRow, thisCol);
+                        result[thisRow, thisCol] = cellValue;
+                    });
+                }
+            }
+
+            Task.WaitAll(tasks);
+
+            return new Matrix(result);
         }
 
         private static double MultiplyRowByColumn(Matrix left, Matrix right, int row, int col)
@@ -110,7 +133,7 @@ namespace Multithreading
                 {
                     // we multiply `this` row vector number `row` by `other` column vector number `col`.
                     // we store the result at `result[row, col]`
-                    result[row, col] += MultiplyRowByColumn(this, other, row, col);
+                    result[row, col] = MultiplyRowByColumn(this, other, row, col);
                 }
             }
 
