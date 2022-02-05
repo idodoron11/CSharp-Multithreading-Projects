@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace Multithreading.UnitTests
 {
-    public class Tests
+    public class SudokuBoardTests
     {
         [SetUp]
         public void Setup()
