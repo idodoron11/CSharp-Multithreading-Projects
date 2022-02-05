@@ -84,6 +84,16 @@ namespace Multithreading
             throw new NotImplementedException();
         }
 
+        private static double MultiplyRowByColumn(Matrix left, Matrix right, int row, int col)
+        {
+            double result = 0;
+            for (int index = 0; index < left.GetWidth(); ++index)
+            {
+                result += left.Get(row, index) * right.Get(index, col);
+            }
+            return result;
+        }
+
         public Matrix NaiveMultiplyBy(Matrix other)
         {
             if (other == null)
@@ -100,11 +110,7 @@ namespace Multithreading
                 {
                     // we multiply `this` row vector number `row` by `other` column vector number `col`.
                     // we store the result at `result[row, col]`
-
-                    for (int index = 0; index < this.GetWidth(); ++index)
-                    {
-                        result[row, col] += this.Get(row, index) * other.Get(index, col);
-                    }
+                    result[row, col] += MultiplyRowByColumn(this, other, row, col);
                 }
             }
 
