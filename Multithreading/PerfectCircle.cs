@@ -37,7 +37,87 @@ namespace Multithreading
                 // since x advances one step in each iteration, the while loop is guranteed to terminate.
                 // we expect that when it happens, `y` value would be 0.
             }
-        }        
+        }
+
+        public static void EfficientDraw(int[,] arr, Circle circle)
+        {
+            // Parameters:
+            //   arr:
+            //     the array in which the circle will be drawn.
+            //
+            //   circle:
+            //     the circle that will be drawn in the array
+
+            Canvas canvas = new Canvas(arr);
+            canvas.SetCenter(circle.a, circle.b);
+            Thread[] quadrants = new Thread[4];
+
+            quadrants[0] = new Thread(() =>
+            {
+                int x = 0, y = circle.radius;
+                double delta1, delta2;
+                while (x < circle.radius && y > 0)
+                {
+                    canvas.SetPoint(x, y, 1);
+                    delta1 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x + 1, y - 1));
+                    delta2 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x + 1, y));
+                    x += 1;
+                    y = (delta1 <= delta2) ? y - 1 : y;
+                }
+            });
+
+            quadrants[1] = new Thread(() =>
+            {
+                int x = circle.radius, y = 0;
+                double delta1, delta2;
+                while (x > 0 && y > -circle.radius)
+                {
+                    canvas.SetPoint(x, y, 1);
+                    delta1 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x - 1, y - 1));
+                    delta2 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x, y - 1));
+                    y -= 1;
+                    x = (delta1 <= delta2) ? x - 1 : x;
+                }
+            });
+
+            quadrants[2] = new Thread(() =>
+            {
+                int x = 0, y = -circle.radius;
+                double delta1, delta2;
+                while (x > -circle.radius && y < 0)
+                {
+                    canvas.SetPoint(x, y, 1);
+                    delta1 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x - 1, y + 1));
+                    delta2 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x - 1, y));
+                    x -= 1;
+                    y = (delta1 <= delta2) ? y + 1 : y;
+                }
+            });
+
+            quadrants[3] = new Thread(() =>
+            {
+                int x = -circle.radius, y = 0;
+                double delta1, delta2;
+                while (x < 0 && y < circle.radius)
+                {
+                    canvas.SetPoint(x, y, 1);
+                    delta1 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x + 1, y + 1));
+                    delta2 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x, y + 1));
+                    y += 1;
+                    x = (delta1 <= delta2) ? x + 1 : x;
+                }
+            });
+
+            for (int i = 0; i < 4; ++i)
+            {
+                quadrants[i].Start();
+            }
+
+            for (int i = 0; i < 4; ++i)
+            {
+                quadrants[i].Join();
+            }
+        }
     }
 
     internal class Circle
