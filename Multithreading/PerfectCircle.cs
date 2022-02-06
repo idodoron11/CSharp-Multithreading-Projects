@@ -37,7 +37,6 @@ namespace Multithreading
                 // since x advances one step in each iteration, the while loop is guranteed to terminate.
                 // we expect that when it happens, `y` value would be 0.
             }
-            Console.WriteLine("x = {0}, y = {1}", x, y);
         }        
     }
 
