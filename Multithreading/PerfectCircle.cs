@@ -56,7 +56,7 @@ namespace Multithreading
             {
                 int x = 0, y = circle.radius;
                 double delta1, delta2;
-                while (x < circle.radius && y > 0)
+                while (x <= circle.radius && y >= 0)
                 {
                     canvas.SetPoint(x, y, 1);
                     delta1 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x + 1, y - 1));
@@ -70,7 +70,7 @@ namespace Multithreading
             {
                 int x = circle.radius, y = 0;
                 double delta1, delta2;
-                while (x > 0 && y > -circle.radius)
+                while (x >= 0 && y >= -circle.radius)
                 {
                     canvas.SetPoint(x, y, 1);
                     delta1 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x - 1, y - 1));
@@ -84,7 +84,7 @@ namespace Multithreading
             {
                 int x = 0, y = -circle.radius;
                 double delta1, delta2;
-                while (x > -circle.radius && y < 0)
+                while (x >= -circle.radius && y <= 0)
                 {
                     canvas.SetPoint(x, y, 1);
                     delta1 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x - 1, y + 1));
@@ -98,7 +98,7 @@ namespace Multithreading
             {
                 int x = -circle.radius, y = 0;
                 double delta1, delta2;
-                while (x < 0 && y < circle.radius)
+                while (x <= 0 && y <= circle.radius)
                 {
                     canvas.SetPoint(x, y, 1);
                     delta1 = Math.Abs(Math.Pow(circle.radius, 2) - canvas.DistanceFromOrigin(x + 1, y + 1));
